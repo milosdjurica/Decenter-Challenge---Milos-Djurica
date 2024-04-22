@@ -2,6 +2,7 @@
 
 import { initWeb3 } from "@/utils/web3";
 import { useEffect } from "react";
+import ChooseToken from "./components/choose-token";
 
 export default function Home() {
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function Home() {
       >
         Click
       </button>
+      <ChooseToken />
     </div>
   );
 }
-
