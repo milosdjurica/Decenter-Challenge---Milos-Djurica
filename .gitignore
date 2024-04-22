@@ -9,6 +9,11 @@
 # testing
 /coverage
 
+# /a is folder where i put notes
+/a
+.env
+
+
 # next.js
 /.next/
 /out/
