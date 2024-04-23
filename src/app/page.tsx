@@ -3,6 +3,7 @@
 import { initWeb3 } from "@/utils/web3";
 import { useEffect } from "react";
 import ChooseToken from "../components/choose-token";
+import DisplayInfo from "@/components/display-info";
 
 export default function Home() {
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function Home() {
         Click
       </button>
       <ChooseToken />
+      <DisplayInfo />
     </div>
   );
 }

@@ -10,3 +10,13 @@ export type CdpResponse = {
   collateral: BigInt;
   debt: BigInt;
 };
+
+export type TokenStore = {
+  token: TokenType;
+  setToken: (to: TokenType) => void;
+};
+
+export type CdpInfoStore = {
+  cdpInfoArray: CdpResponse[];
+  setCdpInfoArray: (cdpInfoArray: CdpResponse[]) => void;
+};

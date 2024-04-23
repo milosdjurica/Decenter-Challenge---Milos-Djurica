@@ -1,31 +1,52 @@
 "use client";
-import { vaultAbi } from "@/abi/vault.abi";
+import { useEffect, useState } from "react";
+
+import { vaultAbi } from "@/utils/abi/vault.abi";
 import { vaultAddress } from "@/utils/consts";
-import { CdpResponse, TokenType } from "@/utils/types";
-import { TokenState, zustandStore } from "@/utils/zustandStore";
-import { useState } from "react";
+import {
+  CdpInfoStore,
+  CdpResponse,
+  TokenStore,
+  TokenType,
+} from "@/utils/types";
+import { cdpInfoArrayStore, tokenStore } from "@/utils/zustandStore";
 
 export default function ChooseToken() {
-  const [token, setToken] = zustandStore((state: TokenState) => [
+  const [token, setToken] = tokenStore((state: TokenStore) => [
     state.token,
     state.setToken,
   ]);
 
+  const [cdpInfoArray, setCdpInfoArray] = cdpInfoArrayStore(
+    (state: CdpInfoStore) => [state.cdpInfoArray, state.setCdpInfoArray]
+  );
+
   const [cdpId, setCdpId] = useState(0);
-  const [cdpInfo, setCdpInfo] = useState<CdpResponse[]>([]);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      fetchCDP();
+    }, 5000);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [cdpId, token]);
 
   // TODO call multiple times until gets 20 closest
   async function fetchCDP() {
     try {
       const vault = new window.web3.eth.Contract(vaultAbi, vaultAddress);
-      let info: CdpResponse = await vault.methods.getCdpInfo(cdpId).call();
+      let newCdpInfo: CdpResponse = await vault.methods
+        .getCdpInfo(cdpId)
+        .call();
       // Transforming bytes into ETH/WBTC/WSTETH string
-      info.ilk = window.web3.utils
-        .hexToAscii(info.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      newCdpInfo.ilk = window.web3.utils
+        .hexToAscii(newCdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
         .split("-")[0]; // "ETH"
 
-      if (info.ilk === token)
-        setCdpInfo((prevCdpInfo) => [...prevCdpInfo, info]);
+      if (newCdpInfo.ilk === token)
+        setCdpInfoArray([...cdpInfoArray, newCdpInfo]);
     } catch (error) {
       console.log("error", error);
       throw error;
@@ -56,19 +77,6 @@ export default function ChooseToken() {
         />
         <p>Selected CDP ID:{cdpId}</p>
       </div>
-
-      {/* // TODO -> remove this button and make debouncing input, 
-      // TODO -> and create new component for displaying values */}
-      <button onClick={() => fetchCDP()}>Fetch data!</button>
-      {cdpInfo && (
-        <div>
-          {cdpInfo.map((info, index) => (
-            <p key={index}>
-              {Number(info.collateral) / 1e18} {info.ilk}
-            </p>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
