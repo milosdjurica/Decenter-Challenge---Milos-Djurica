@@ -14,10 +14,17 @@ export default function ChooseToken() {
   const [cdpId, setCdpId] = useState(0);
 
   async function fetchCDP() {
-    console.log("FETCHING");
-
-    const vault = new window.web3.eth.Contract(vaultAbi, vaultAddress);
-    console.log(vault);
+    try {
+      const vault = new window.web3.eth.Contract(vaultAbi, vaultAddress);
+      // TODO -> Create types
+      const info = await vault.methods.getCdpInfo(cdpId).call();
+      const ilk = window.web3.utils.hexToAscii(info.ilk);
+      console.log("ilk", ilk);
+      console.log(info);
+    } catch (error) {
+      console.log("error", error);
+      throw error;
+    }
   }
 
   return (
