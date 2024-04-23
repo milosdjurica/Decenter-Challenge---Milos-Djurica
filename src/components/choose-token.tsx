@@ -12,7 +12,7 @@ export default function ChooseToken() {
   ]);
 
   const [cdpId, setCdpId] = useState(0);
-  const [cdpInfo, setCdpInfo] = useState<CdpResponse>();
+  const [cdpInfo, setCdpInfo] = useState<CdpResponse[]>([]);
 
   // TODO call multiple times until gets 20 closest
   async function fetchCDP() {
@@ -24,7 +24,8 @@ export default function ChooseToken() {
         .hexToAscii(info.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
         .split("-")[0]; // "ETH"
 
-      if (info.ilk === token) setCdpInfo(info);
+      if (info.ilk === token)
+        setCdpInfo((prevCdpInfo) => [...prevCdpInfo, info]);
     } catch (error) {
       console.log("error", error);
       throw error;
@@ -53,14 +54,20 @@ export default function ChooseToken() {
           value={cdpId}
           onChange={(e) => setCdpId(Number(e.target.value))}
         />
-
         <p>Selected CDP ID:{cdpId}</p>
       </div>
+
+      {/* // TODO -> remove this button and make debouncing input, 
+      // TODO -> and create new component for displaying values */}
       <button onClick={() => fetchCDP()}>Fetch data!</button>
       {cdpInfo && (
-        <p>
-          {Number(cdpInfo.collateral) / 1e18} {cdpInfo.ilk}
-        </p>
+        <div>
+          {cdpInfo.map((info, index) => (
+            <p key={index}>
+              {Number(info.collateral) / 1e18} {info.ilk}
+            </p>
+          ))}
+        </div>
       )}
     </div>
   );
