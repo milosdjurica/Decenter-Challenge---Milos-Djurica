@@ -18,14 +18,13 @@ export default function ChooseToken() {
   async function fetchCDP() {
     try {
       const vault = new window.web3.eth.Contract(vaultAbi, vaultAddress);
-      // TODO -> Create types
       let info: CdpResponse = await vault.methods.getCdpInfo(cdpId).call();
-      info.ilk = window.web3.utils.hexToAscii(info.ilk).replace(/\0/g, "");
-      console.log("ilk", info.ilk);
-      // TODO -> check if type is same as TOKEN, if yes then put it into state and print out
-      if (info.ilk === "ETH-C") setCdpInfo(info);
-      console.log(info);
-      console.log("cdpInfo", cdpInfo);
+      // Transforming bytes into ETH/WBTC/WSTETH string
+      info.ilk = window.web3.utils
+        .hexToAscii(info.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+        .split("-")[0]; // "ETH"
+
+      if (info.ilk === token) setCdpInfo(info);
     } catch (error) {
       console.log("error", error);
       throw error;
@@ -58,6 +57,11 @@ export default function ChooseToken() {
         <p>Selected CDP ID:{cdpId}</p>
       </div>
       <button onClick={() => fetchCDP()}>Fetch data!</button>
+      {cdpInfo && (
+        <p>
+          {Number(cdpInfo.collateral) / 1e18} {cdpInfo.ilk}
+        </p>
+      )}
     </div>
   );
 }
