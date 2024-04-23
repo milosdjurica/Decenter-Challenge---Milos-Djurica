@@ -40,6 +40,7 @@ export default function ChooseToken() {
       let newCdpInfo: CdpResponse = await vault.methods
         .getCdpInfo(cdpId)
         .call();
+      newCdpInfo.id = cdpId;
       // Transforming bytes into ETH/WBTC/WSTETH string
       newCdpInfo.ilk = window.web3.utils
         .hexToAscii(newCdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"

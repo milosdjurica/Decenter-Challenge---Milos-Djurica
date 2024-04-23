@@ -3,6 +3,7 @@ import { Address, Bytes } from "web3";
 export type TokenType = "ETH" | "WBTC" | "WSTETH";
 
 export type CdpResponse = {
+  id: number;
   urn: Address;
   owner: Address;
   userAddr: Address;

@@ -13,7 +13,8 @@ export default function DisplayInfo() {
         <div>
           {cdpInfoArray.map((cdpInfo, index) => (
             <p key={index}>
-              {Number(cdpInfo.collateral) / 1e18} {cdpInfo.ilk}
+              ID : {cdpInfo.id} | VALUE : {Number(cdpInfo.collateral) / 1e18}{" "}
+              {cdpInfo.ilk}
             </p>
           ))}
         </div>
