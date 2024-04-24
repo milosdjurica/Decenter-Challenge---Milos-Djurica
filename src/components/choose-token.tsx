@@ -12,8 +12,10 @@ export default function ChooseToken() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      setCdpInfoArray([]);
-      if (cdpId > 0) {
+      if (cdpInfoArray.length > 0 && cdpInfoArray.length < 20) {
+        alert("Already loading data! Try again when loading is finished!");
+      } else if (cdpId > 0) {
+        setCdpInfoArray([]);
         fetchAll();
       }
     }, 5000);
