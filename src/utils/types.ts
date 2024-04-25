@@ -3,13 +3,22 @@ import { Address, Bytes } from "web3";
 export type TokenType = "ETH" | "WBTC" | "WSTETH";
 
 export type CdpResponse = {
-  id: number;
   urn: Address;
   owner: Address;
   userAddr: Address;
   ilk: Bytes;
   collateral: BigInt;
-  debt: BigInt | number;
+  debt: BigInt;
+};
+
+export type CdpInfoFormatted = {
+  id: number;
+  urn: Address;
+  owner: Address;
+  userAddr: Address;
+  ilk: TokenType;
+  collateral: number;
+  debt: number;
 };
 
 export type IlksResponse = {

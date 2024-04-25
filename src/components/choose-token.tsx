@@ -3,12 +3,18 @@ import { useEffect, useState } from "react";
 
 import { vaultAbi } from "@/utils/abi/vault.abi";
 import { rateContractAddress, vaultAddress } from "@/utils/consts";
-import { CdpResponse, IlksResponse, TokenType } from "@/utils/types";
+import {
+  CdpInfoFormatted,
+  CdpResponse,
+  IlksResponse,
+  TokenType,
+} from "@/utils/types";
 import { rateContractAbi } from "@/utils/abi/rate.abi";
 import { Bytes, Contract } from "web3";
+import CdpInfoList from "./cdp-info-list";
 
 export default function ChooseToken() {
-  const [cdpInfoArray, setCdpInfoArray] = useState<CdpResponse[]>([]);
+  const [cdpInfoArray, setCdpInfoArray] = useState<CdpInfoFormatted[]>([]);
   const [token, setToken] = useState<TokenType>("ETH");
   const [cdpId, setCdpId] = useState(0);
 
@@ -28,7 +34,7 @@ export default function ChooseToken() {
   }, [cdpId, token]);
 
   async function fetchAll() {
-    let arr: CdpResponse[] = [];
+    let arr: CdpInfoFormatted[] = [];
     let counter = 1;
     const first = await fetchCDP(cdpId);
     if (first) arr.push(first);
@@ -50,20 +56,13 @@ export default function ChooseToken() {
         vaultAddress
       );
       let newCdpInfo: CdpResponse = await vault.methods.getCdpInfo(id).call();
-
-      newCdpInfo.debt = await calculateDebtRate(
-        newCdpInfo.debt,
-        newCdpInfo.ilk
-      );
-      newCdpInfo.id = id;
-      // Transforming bytes into ETH/WBTC/WSTETH string
-      newCdpInfo.ilk = window.web3.utils
-        .hexToAscii(newCdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
-        .split("-")[0]; // "ETH"
-
-      if (newCdpInfo.ilk === token) {
-        setCdpInfoArray((prev: CdpResponse[]) => [...prev, newCdpInfo]);
-        return newCdpInfo;
+      const formattedCdpInfo = await formatCdpInfo(id, newCdpInfo);
+      if (formattedCdpInfo.ilk === token) {
+        setCdpInfoArray((prev: CdpInfoFormatted[]) => [
+          ...prev,
+          formattedCdpInfo,
+        ]);
+        return formattedCdpInfo;
       }
     } catch (error) {
       console.log("error", error);
@@ -71,13 +70,30 @@ export default function ChooseToken() {
     }
   }
 
-  async function calculateDebtRate(debt: BigInt | number, ilk: Bytes) {
+  async function formatCdpInfo(id: number, cdpInfo: CdpResponse) {
     try {
-      const rate: Contract<typeof rateContractAbi> =
+      const rateContract: Contract<typeof rateContractAbi> =
         new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
-      const debtRate: IlksResponse = await rate.methods.ilks(ilk).call();
-      console.log("debtRate", debtRate);
-      return (Number(debt) * Number(debtRate.rate)) / 1e18 / 1e27;
+      const newCollateral = Number(cdpInfo.collateral) / 1e18;
+      const debtRate: IlksResponse = await rateContract.methods
+        .ilks(cdpInfo.ilk)
+        .call();
+      const newDebt =
+        (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
+      // Transforming bytes into ETH/WBTC/WSTETH string
+      const newIlk = window.web3.utils
+        .hexToAscii(cdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+        .split("-")[0]; // "ETH"
+
+      const formattedCdpInfo: CdpInfoFormatted = {
+        ...cdpInfo,
+        id,
+        debt: newDebt,
+        ilk: newIlk,
+        collateral: newCollateral,
+      };
+
+      return formattedCdpInfo;
     } catch (error) {
       console.log("error", error);
       throw error;
@@ -98,7 +114,6 @@ export default function ChooseToken() {
             <option value="WBTC">WBTC</option>
             <option value="WSTETH">WSTETH</option>
           </select>
-          <p>Selected Token: {token}</p>
         </div>
         <div>
           <label htmlFor="cdpId">Insert CDP ID:</label>
@@ -107,20 +122,9 @@ export default function ChooseToken() {
             value={cdpId}
             onChange={(e) => setCdpId(Number(e.target.value))}
           />
-          <p>Selected CDP ID:{cdpId}</p>
         </div>
       </div>
-      {cdpInfoArray && (
-        <div>
-          {cdpInfoArray.map((cdpInfo, index) => (
-            <p key={index}>
-              ID : {cdpInfo.id} | VALUE : {Number(cdpInfo.collateral) / 1e18} |
-              DEBT : {Number(cdpInfo.debt)}
-              {cdpInfo.ilk}
-            </p>
-          ))}
-        </div>
-      )}
+      <CdpInfoList cdpInfoArray={cdpInfoArray} />
     </div>
   );
 }
