@@ -8,8 +8,8 @@ export default function CdpInfoList({
 }) {
   return (
     <div className="flex flex-col">
-      {cdpInfoArray.map((cdpInfo, index) => (
-        <Link href={"/" + cdpInfo.id} key={index}>
+      {cdpInfoArray.map((cdpInfo) => (
+        <Link href={"/" + cdpInfo.id} key={cdpInfo.id}>
           ID : {cdpInfo.id} | COLLATERAL : {Number(cdpInfo.collateral)}{" "}
           {cdpInfo.ilk} | DEBT : {Number(cdpInfo.debt)} DAI
         </Link>
