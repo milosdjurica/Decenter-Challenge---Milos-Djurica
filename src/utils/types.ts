@@ -9,7 +9,15 @@ export type CdpResponse = {
   userAddr: Address;
   ilk: Bytes;
   collateral: BigInt;
-  debt: BigInt;
+  debt: BigInt | number;
+};
+
+export type IlksResponse = {
+  Art: BigInt;
+  dust: BigInt;
+  line: BigInt;
+  rate: BigInt;
+  spot: BigInt;
 };
 
 export type TokenStore = {

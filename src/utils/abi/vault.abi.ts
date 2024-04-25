@@ -20,4 +20,4 @@ export const vaultAbi = [
     stateMutability: "view",
     type: "function",
   },
-];
+] as const;

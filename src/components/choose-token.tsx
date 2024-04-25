@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 
 import { vaultAbi } from "@/utils/abi/vault.abi";
-import { vaultAddress } from "@/utils/consts";
-import { CdpResponse, TokenType } from "@/utils/types";
+import { rateContractAddress, vaultAddress } from "@/utils/consts";
+import { CdpResponse, IlksResponse, TokenType } from "@/utils/types";
+import { rateContractAbi } from "@/utils/abi/rate.abi";
+import { Bytes, Contract } from "web3";
 
 export default function ChooseToken() {
   const [cdpInfoArray, setCdpInfoArray] = useState<CdpResponse[]>([]);
@@ -43,9 +45,16 @@ export default function ChooseToken() {
 
   async function fetchCDP(id: number) {
     try {
-      const vault = new window.web3.eth.Contract(vaultAbi, vaultAddress);
+      const vault: Contract<typeof vaultAbi> = new window.web3.eth.Contract(
+        vaultAbi,
+        vaultAddress
+      );
       let newCdpInfo: CdpResponse = await vault.methods.getCdpInfo(id).call();
 
+      newCdpInfo.debt = await calculateDebtRate(
+        newCdpInfo.debt,
+        newCdpInfo.ilk
+      );
       newCdpInfo.id = id;
       // Transforming bytes into ETH/WBTC/WSTETH string
       newCdpInfo.ilk = window.web3.utils
@@ -62,40 +71,56 @@ export default function ChooseToken() {
     }
   }
 
+  async function calculateDebtRate(debt: BigInt | number, ilk: Bytes) {
+    try {
+      const rate: Contract<typeof rateContractAbi> =
+        new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
+      const debtRate: IlksResponse = await rate.methods.ilks().call();
+      console.log("debtRate", debtRate);
+      return (Number(debt) * Number(debtRate.rate)) / 1e18 / 1e18 / 1e9;
+    } catch (error) {
+      console.log("error", error);
+      throw error;
+    }
+  }
+
   return (
-    <div className="flex justify-evenly">
-      <div>
-        <label htmlFor="tokenSelect">Select Token:</label>
-        <select
-          id="tokenSelect"
-          value={token}
-          onChange={(e) => setToken(e.target.value as TokenType)}
-        >
-          <option value="ETH">ETH</option>
-          <option value="WBTC">WBTC</option>
-          <option value="WSTETH">WSTETH</option>
-        </select>
-        <p>Selected Token: {token}</p>
+    <div className="flex flex-col">
+      <div className="flex justify-evenly">
+        <div>
+          <label htmlFor="tokenSelect">Select Token:</label>
+          <select
+            id="tokenSelect"
+            value={token}
+            onChange={(e) => setToken(e.target.value as TokenType)}
+          >
+            <option value="ETH">ETH</option>
+            <option value="WBTC">WBTC</option>
+            <option value="WSTETH">WSTETH</option>
+          </select>
+          <p>Selected Token: {token}</p>
+        </div>
+        <div>
+          <label htmlFor="cdpId">Insert CDP ID:</label>
+          <input
+            id="cdpId"
+            value={cdpId}
+            onChange={(e) => setCdpId(Number(e.target.value))}
+          />
+          <p>Selected CDP ID:{cdpId}</p>
+        </div>
       </div>
-      <div>
-        <label htmlFor="cdpId">Insert CDP ID:</label>
-        <input
-          id="cdpId"
-          value={cdpId}
-          onChange={(e) => setCdpId(Number(e.target.value))}
-        />
-        <p>Selected CDP ID:{cdpId}</p>
-        {cdpInfoArray && (
-          <div>
-            {cdpInfoArray.map((cdpInfo, index) => (
-              <p key={index}>
-                ID : {cdpInfo.id} | VALUE : {Number(cdpInfo.collateral) / 1e18}{" "}
-                {cdpInfo.ilk}
-              </p>
-            ))}
-          </div>
-        )}
-      </div>
+      {cdpInfoArray && (
+        <div>
+          {cdpInfoArray.map((cdpInfo, index) => (
+            <p key={index}>
+              ID : {cdpInfo.id} | VALUE : {Number(cdpInfo.collateral) / 1e18} |
+              DEBT : {Number(cdpInfo.debt)}
+              {cdpInfo.ilk}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
