@@ -75,9 +75,9 @@ export default function ChooseToken() {
     try {
       const rate: Contract<typeof rateContractAbi> =
         new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
-      const debtRate: IlksResponse = await rate.methods.ilks().call();
+      const debtRate: IlksResponse = await rate.methods.ilks(ilk).call();
       console.log("debtRate", debtRate);
-      return (Number(debt) * Number(debtRate.rate)) / 1e18 / 1e18 / 1e9;
+      return (Number(debt) * Number(debtRate.rate)) / 1e18 / 1e27;
     } catch (error) {
       console.log("error", error);
       throw error;
