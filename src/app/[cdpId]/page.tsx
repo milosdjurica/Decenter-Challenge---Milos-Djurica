@@ -94,6 +94,21 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
       : usdcLiquidationRatio;
   }
 
+  function maxCollateralValueToExtract(cdpInfo: CdpInfoFormatted) {
+    const totalValue = cdpInfo.collateral * getPrice(cdpInfo.ilk);
+    const minimumValue =
+      (cdpInfo.debt * getLiquidationRatio(cdpInfo.ilk)) / 100;
+    return totalValue - minimumValue;
+  }
+
+  function maxDebtPossibleWIthoutLiquidation(cdpInfo: CdpInfoFormatted) {
+    return (
+      ((cdpInfo.collateral * getPrice(cdpInfo.ilk)) /
+        getLiquidationRatio(cdpInfo.ilk)) *
+      100
+    );
+  }
+
   return (
     <div>
       <h1>CDP PAGE {params.cdpId}</h1>
@@ -106,6 +121,18 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
           <p>
             Collateralization ratio : {collateralizationRatio(cdpInfo)}%.
             Minimum is {getLiquidationRatio(cdpInfo.ilk)}%
+          </p>
+          <p>
+            Max collateral value to extract without getting liquidated :
+            {maxCollateralValueToExtract(cdpInfo)}
+          </p>
+          <p>
+            Max debt possible :{" "}
+            {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(2)}. How much
+            more can you take :{" "}
+            {(
+              maxDebtPossibleWIthoutLiquidation(cdpInfo) - cdpInfo.debt
+            ).toFixed(2)}
           </p>
         </>
       )}
