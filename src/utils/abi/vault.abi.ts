@@ -1,4 +1,4 @@
-export const vaultAbi = [
+export const vaultContractAbi = [
   {
     inputs: [{ internalType: "address", name: "owner", type: "address" }],
     name: "_getProxyOwner",

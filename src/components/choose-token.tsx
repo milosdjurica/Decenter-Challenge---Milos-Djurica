@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Contract } from "web3";
 
-import { vaultAbi } from "@/utils/abi/vault.abi";
 import { rateContractAddress, vaultAddress } from "@/utils/consts";
+import { rateContractAbi, vaultContractAbi } from "@/utils/abi";
 import {
   CdpInfoFormatted,
   CdpResponse,
   IlksResponse,
   TokenType,
 } from "@/utils/types";
-import { rateContractAbi } from "@/utils/abi/rate.abi";
-import { Bytes, Contract } from "web3";
 import CdpInfoList from "./cdp-info-list";
 
 export default function ChooseToken() {
@@ -51,11 +50,11 @@ export default function ChooseToken() {
 
   async function fetchCDP(id: number) {
     try {
-      const vault: Contract<typeof vaultAbi> = new window.web3.eth.Contract(
-        vaultAbi,
-        vaultAddress
-      );
-      let newCdpInfo: CdpResponse = await vault.methods.getCdpInfo(id).call();
+      const vaultContract: Contract<typeof vaultContractAbi> =
+        new window.web3.eth.Contract(vaultContractAbi, vaultAddress);
+      let newCdpInfo: CdpResponse = await vaultContract.methods
+        .getCdpInfo(id)
+        .call();
       const formattedCdpInfo = await formatCdpInfo(id, newCdpInfo);
       if (formattedCdpInfo.ilk === token) {
         setCdpInfoArray((prev: CdpInfoFormatted[]) => [
