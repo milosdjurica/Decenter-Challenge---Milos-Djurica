@@ -76,6 +76,7 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
   }
 
   function collateralizationRatio(cdpInfo: CdpInfoFormatted) {
+    if (cdpInfo.debt <= 0) return 0;
     return (
       (cdpInfo.collateral * getPrice(cdpInfo.ilk) * 100) /
       cdpInfo.debt

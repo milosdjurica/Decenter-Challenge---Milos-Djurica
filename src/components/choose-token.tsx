@@ -11,6 +11,14 @@ import {
   TokenType,
 } from "@/utils/types";
 import CdpInfoList from "./cdp-info-list";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Input } from "./ui/input";
 
 export default function ChooseToken() {
   const [cdpInfoArray, setCdpInfoArray] = useState<CdpInfoFormatted[]>([]);
@@ -25,7 +33,7 @@ export default function ChooseToken() {
         setCdpInfoArray([]);
         fetchAll();
       }
-    }, 5000);
+    }, 3000);
 
     return () => {
       clearTimeout(timerId);
@@ -100,26 +108,34 @@ export default function ChooseToken() {
   }
 
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-evenly">
-        <div>
-          <label htmlFor="tokenSelect">Select Token:</label>
-          <select
-            id="tokenSelect"
-            value={token}
-            onChange={(e) => setToken(e.target.value as TokenType)}
-          >
-            <option value="ETH">ETH</option>
-            <option value="WBTC">WBTC</option>
-            <option value="WSTETH">WSTETH</option>
-          </select>
+    <div className="flex flex-col space-y-6 text-xl p-4">
+      <div className="flex flex-col md:flex-row justify-evenly space-y-6 md:space-y-0">
+        <div className="flex items-center space-x-4">
+          <label htmlFor="tokenSelect" className="text-nowrap">
+            Select Token:
+          </label>
+          <Select onValueChange={(value) => setToken(value as TokenType)}>
+            <SelectTrigger className="w-[180px]" id="tokenSelect">
+              <SelectValue placeholder={token} />
+            </SelectTrigger>
+
+            <SelectContent defaultValue={token}>
+              <SelectItem value="ETH">ETH</SelectItem>
+              <SelectItem value="WBTC">WBTC</SelectItem>
+              <SelectItem value="WSTETH">WSTETH</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div>
-          <label htmlFor="cdpId">Insert CDP ID:</label>
-          <input
+        <div className="flex items-center space-x-4 ">
+          <label htmlFor="cdpId" className="text-nowrap">
+            Insert CDP ID:
+          </label>
+          <Input
             id="cdpId"
+            // type="number"
             value={cdpId}
             onChange={(e) => setCdpId(Number(e.target.value))}
+            className="w-[180px]"
           />
         </div>
       </div>
