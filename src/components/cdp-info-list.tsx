@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DECIMAL_PLACES } from "@/utils/consts";
 
 export default function CdpInfoList({
   cdpInfoArray,
@@ -19,7 +20,7 @@ export default function CdpInfoList({
 }) {
   return (
     <div className="flex flex-col">
-      <Table className="md:w-[90%] m-auto border md:text-lg border-ring">
+      <Table className="md:w-[90%] m-auto border-2 md:text-lg border-primary">
         <TableCaption>
           A list of 20 CDPs closest to the selected ID that have same collateral
           type - {token}.
@@ -27,9 +28,9 @@ export default function CdpInfoList({
 
         <TableHeader>
           <TableRow className="border-b-primary">
-            <TableHead className="">CDP ID</TableHead>
-            <TableHead>Collateral in {token}</TableHead>
-            <TableHead>Debt in DAI</TableHead>
+            <TableHead className="w-1/5">CDP ID</TableHead>
+            <TableHead className="w-2/5">Collateral in {token}</TableHead>
+            <TableHead className="w-2/5">Debt in DAI</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -40,8 +41,12 @@ export default function CdpInfoList({
                 <TableCell className="font-medium text-primary">
                   {cdpInfo.id}
                 </TableCell>
-                <TableCell>{Number(cdpInfo.collateral)}</TableCell>
-                <TableCell>{Number(cdpInfo.debt)} DAI</TableCell>
+                <TableCell>
+                  {Number(cdpInfo.collateral).toFixed(DECIMAL_PLACES)}
+                </TableCell>
+                <TableCell>
+                  {Number(cdpInfo.debt).toFixed(DECIMAL_PLACES)} DAI
+                </TableCell>
               </TableRow>
             </Link>
           ))}
