@@ -2,8 +2,22 @@
 
 import { rateContractAbi } from "@/utils/abi/rate.abi";
 import { vaultContractAbi } from "@/utils/abi/vault.abi";
-import { rateContractAddress, vaultAddress } from "@/utils/consts";
-import { CdpInfoFormatted, CdpResponse, IlksResponse } from "@/utils/types";
+import {
+  btcLiquidationRatio,
+  btcPrice,
+  ethLiquidationRatio,
+  ethPrice,
+  rateContractAddress,
+  usdcLiquidationRatio,
+  usdcPrice,
+  vaultAddress,
+} from "@/utils/consts";
+import {
+  CdpInfoFormatted,
+  CdpResponse,
+  IlksResponse,
+  TokenType,
+} from "@/utils/types";
 import React, { useEffect, useState } from "react";
 import Web3, { Contract } from "web3";
 
@@ -61,15 +75,40 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
     }
   }
 
+  function collateralizationRatio(cdpInfo: CdpInfoFormatted) {
+    return (
+      (cdpInfo.collateral * getPrice(cdpInfo.ilk) * 100) /
+      cdpInfo.debt
+    ).toFixed(2);
+  }
+
+  function getPrice(token: TokenType) {
+    return token === "ETH" ? ethPrice : token === "WBTC" ? btcPrice : usdcPrice;
+  }
+
+  function getLiquidationRatio(token: TokenType) {
+    return token === "ETH"
+      ? ethLiquidationRatio
+      : token === "WBTC"
+      ? btcLiquidationRatio
+      : usdcLiquidationRatio;
+  }
+
   return (
     <div>
       <h1>CDP PAGE {params.cdpId}</h1>
-      {
-        <div>
-          ID : {cdpInfo?.id} | COLLATERAL : {Number(cdpInfo?.collateral)}{" "}
-          {cdpInfo?.ilk} | DEBT : {Number(cdpInfo?.debt)} DAI
-        </div>
-      }
+      {cdpInfo && (
+        <>
+          <div>
+            ID : {cdpInfo?.id} | COLLATERAL : {Number(cdpInfo?.collateral)}{" "}
+            {cdpInfo?.ilk} | DEBT : {Number(cdpInfo?.debt)} DAI
+          </div>
+          <p>
+            Collateralization ratio : {collateralizationRatio(cdpInfo)}%.
+            Minimum is {getLiquidationRatio(cdpInfo.ilk)}%
+          </p>
+        </>
+      )}
     </div>
   );
 }
