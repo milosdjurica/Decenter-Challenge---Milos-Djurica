@@ -124,15 +124,16 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
           </p>
           <p>
             Max collateral value to extract without getting liquidated :
-            {maxCollateralValueToExtract(cdpInfo)}
+            {maxCollateralValueToExtract(cdpInfo).toFixed(2)} $
           </p>
           <p>
-            Max debt possible :{" "}
-            {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(2)}. How much
-            more can you take :{" "}
+            Max debt possible:{" "}
+            {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(2)} DAI. How
+            much more can you take:{" "}
             {(
               maxDebtPossibleWIthoutLiquidation(cdpInfo) - cdpInfo.debt
-            ).toFixed(2)}
+            ).toFixed(2)}{" "}
+            DAI.
           </p>
         </>
       )}
