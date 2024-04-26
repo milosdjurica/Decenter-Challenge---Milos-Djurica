@@ -139,7 +139,7 @@ export default function ChooseToken() {
           />
         </div>
       </div>
-      <CdpInfoList cdpInfoArray={cdpInfoArray} />
+      <CdpInfoList cdpInfoArray={cdpInfoArray} token={token} />
     </div>
   );
 }
