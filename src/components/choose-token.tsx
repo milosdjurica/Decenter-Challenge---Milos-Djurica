@@ -50,8 +50,10 @@ export default function ChooseToken() {
       if (foundHigher) arr.push(foundHigher);
       if (arr.length === 20) break;
 
-      const foundLower = await fetchCDP(cdpId - counter);
-      if (foundLower) arr.push(foundLower);
+      if (cdpId - counter > 0) {
+        const foundLower = await fetchCDP(cdpId - counter);
+        if (foundLower) arr.push(foundLower);
+      }
       counter++;
     }
   }
@@ -85,6 +87,7 @@ export default function ChooseToken() {
       const debtRate: IlksResponse = await rateContract.methods
         .ilks(cdpInfo.ilk)
         .call();
+      // 1e18 -> 18 decimals for debt, 1e27 -> 27 decimals for debt rate
       const newDebt =
         (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
       // Transforming bytes into ETH/WBTC/WSTETH string
