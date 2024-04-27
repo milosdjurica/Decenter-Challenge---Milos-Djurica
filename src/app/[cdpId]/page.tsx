@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { rateContractAbi } from "@/utils/abi/rate.abi";
 import { vaultContractAbi } from "@/utils/abi/vault.abi";
 import {
+  DECIMAL_PLACES,
   btcLiquidationRatio,
   btcPrice,
   ethLiquidationRatio,
@@ -23,11 +25,16 @@ import Web3, { Contract } from "web3";
 
 export default function CdpPage({ params }: { params: { cdpId: number } }) {
   const [cdpInfo, setCdpInfo] = useState<CdpInfoFormatted>();
+  const [message, setMessage] = useState();
 
   useEffect(() => {
-    const web3 = new Web3(window.ethereum);
-    window.web3 = web3;
-    fetchCDP();
+    try {
+      const web3 = new Web3(window.ethereum);
+      window.web3 = web3;
+      fetchCDP();
+    } catch (error) {
+      console.log("error:", error);
+    }
   }, []);
 
   async function fetchCDP() {
@@ -80,7 +87,7 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
     return (
       (cdpInfo.collateral * getPrice(cdpInfo.ilk) * 100) /
       cdpInfo.debt
-    ).toFixed(2);
+    ).toFixed(DECIMAL_PLACES);
   }
 
   function getPrice(token: TokenType) {
@@ -119,35 +126,90 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
     );
   }
 
+  async function signMessage() {
+    try {
+      const accounts = await window.web3.eth.requestAccounts();
+      console.log("window.web3.eth", window.web3.eth);
+      const signature = await window.web3.eth.personal.sign(
+        "Ovo je moj CDP",
+        accounts[0],
+        ""
+      );
+      setMessage(signature);
+    } catch (error) {
+      console.error("error", error);
+      throw error;
+    }
+  }
+
   return (
-    <div>
-      <h1>CDP PAGE {params.cdpId}</h1>
+    <div className="mt-4 text-xl space-y-6 m-auto flex flex-col items-center w-[90%] max-w-[90%]">
+      <h1 className="text-4xl font-semibold">CDP ID - {params.cdpId}</h1>
       {cdpInfo && (
-        <>
-          <div>
-            ID : {cdpInfo?.id} | COLLATERAL : {Number(cdpInfo?.collateral)}{" "}
-            {cdpInfo?.ilk} | DEBT : {Number(cdpInfo?.debt)} DAI
-          </div>
+        <div className="space-y-4">
           <p>
-            Collateralization ratio : {collateralizationRatio(cdpInfo)}%.
-            Minimum is {getLiquidationRatio(cdpInfo.ilk)}%
+            COLLATERAL:{" "}
+            <span className="underline font-semibold">
+              {Number(cdpInfo?.collateral).toFixed(DECIMAL_PLACES)}{" "}
+              {cdpInfo?.ilk}
+            </span>
+          </p>
+
+          <p>
+            DEBT:{" "}
+            <span className="underline font-semibold">
+              {Number(cdpInfo?.debt).toFixed(DECIMAL_PLACES)} DAI
+            </span>
           </p>
           <p>
-            Max collateral value to extract without getting liquidated :
-            {maxCollateralValueToExtract(cdpInfo)} {cdpInfo.ilk}. Or $
-            {maxCollateralValueToExtractInUSD(cdpInfo).toFixed(2)} dollars.
+            Collateralization ratio:{" "}
+            <span className="underline font-semibold">
+              {collateralizationRatio(cdpInfo)}%
+            </span>
+            .
+          </p>
+          <p>
+            Minimum ratio is:{" "}
+            <span className="underline font-semibold">
+              {getLiquidationRatio(cdpInfo.ilk)}%.
+            </span>{" "}
+          </p>
+          <p>
+            Max collateral value to extract without getting liquidated:{" "}
+            <span className="underline font-semibold">
+              {maxCollateralValueToExtract(cdpInfo).toFixed(DECIMAL_PLACES)}{" "}
+              {cdpInfo.ilk} ($
+              {maxCollateralValueToExtractInUSD(cdpInfo).toFixed(
+                DECIMAL_PLACES
+              )}{" "}
+              USD).
+            </span>
           </p>
           <p>
             Max debt possible:{" "}
-            {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(2)} DAI. How
-            much more can you take:{" "}
-            {(
-              maxDebtPossibleWIthoutLiquidation(cdpInfo) - cdpInfo.debt
-            ).toFixed(2)}{" "}
-            DAI.
+            <span className="underline font-semibold">
+              {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(
+                DECIMAL_PLACES
+              )}{" "}
+              DAI.
+            </span>
           </p>
-        </>
+          <p>
+            How much more can you take:{" "}
+            <span className="underline font-semibold">
+              {(
+                maxDebtPossibleWIthoutLiquidation(cdpInfo) - cdpInfo.debt
+              ).toFixed(DECIMAL_PLACES)}{" "}
+              DAI.
+            </span>
+          </p>
+        </div>
       )}
+      <Button variant="default" onClick={signMessage}>
+        Sign message!
+      </Button>
+      <h4>Signature: </h4>
+      <p className="text-wrap">{message}</p>
     </div>
   );
 }
