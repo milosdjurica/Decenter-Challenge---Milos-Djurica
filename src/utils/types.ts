@@ -1,12 +1,12 @@
-import { Address, Bytes } from "web3";
+import { Address } from "web3";
 
-export type TokenType = "ETH" | "WBTC" | "WSTETH";
+export type TokenType = "ETH-A" | "WBTC-A" | "WSTETH-A";
 
 export type CdpResponse = {
   urn: Address;
   owner: Address;
   userAddr: Address;
-  ilk: Bytes;
+  ilk: string;
   collateral: BigInt;
   debt: BigInt;
 };
@@ -16,7 +16,7 @@ export type CdpInfoFormatted = {
   urn: Address;
   owner: Address;
   userAddr: Address;
-  ilk: TokenType;
+  ilk: string;
   collateral: number;
   debt: number;
 };
@@ -27,14 +27,4 @@ export type IlksResponse = {
   line: BigInt;
   rate: BigInt;
   spot: BigInt;
-};
-
-export type TokenStore = {
-  token: TokenType;
-  setToken: (to: TokenType) => void;
-};
-
-export type CdpInfoStore = {
-  cdpInfoArray: CdpResponse[];
-  setCdpInfoArray: (cdpInfoArray: CdpResponse[]) => void;
 };

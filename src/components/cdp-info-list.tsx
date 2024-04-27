@@ -45,7 +45,7 @@ export default function CdpInfoList({
                   {Number(cdpInfo.collateral).toFixed(DECIMAL_PLACES)}
                 </TableCell>
                 <TableCell>
-                  {Number(cdpInfo.debt).toFixed(DECIMAL_PLACES)} DAI
+                  {Number(cdpInfo.debt).toFixed(DECIMAL_PLACES)}
                 </TableCell>
               </TableRow>
             </Link>

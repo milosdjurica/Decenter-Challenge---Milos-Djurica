@@ -19,10 +19,11 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Input } from "./ui/input";
+import { bytesToString } from "@defisaver/tokens/esm/utils";
 
 export default function ChooseToken() {
   const [cdpInfoArray, setCdpInfoArray] = useState<CdpInfoFormatted[]>([]);
-  const [token, setToken] = useState<TokenType>("ETH");
+  const [token, setToken] = useState<TokenType>("ETH-A");
   const [cdpId, setCdpId] = useState(0);
 
   useEffect(() => {
@@ -91,9 +92,7 @@ export default function ChooseToken() {
       const newDebt =
         (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
       // Transforming bytes into ETH/WBTC/WSTETH string
-      const newIlk = window.web3.utils
-        .hexToAscii(cdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
-        .split("-")[0]; // "ETH"
+      const newIlk = bytesToString(cdpInfo.ilk);
 
       const formattedCdpInfo: CdpInfoFormatted = {
         ...cdpInfo,
@@ -123,9 +122,9 @@ export default function ChooseToken() {
             </SelectTrigger>
 
             <SelectContent defaultValue={token}>
-              <SelectItem value="ETH">ETH</SelectItem>
-              <SelectItem value="WBTC">WBTC</SelectItem>
-              <SelectItem value="WSTETH">WSTETH</SelectItem>
+              <SelectItem value="ETH-A">ETH-A</SelectItem>
+              <SelectItem value="WBTC-A">WBTC-A</SelectItem>
+              <SelectItem value="WSTETH-A">WSTETH-A</SelectItem>
             </SelectContent>
           </Select>
         </div>

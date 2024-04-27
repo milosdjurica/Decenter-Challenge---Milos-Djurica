@@ -13,13 +13,11 @@ import {
   usdcLiquidationRatio,
   usdcPrice,
   vaultAddress,
+  wstethLiquidationRatio,
+  wstethPrice,
 } from "@/utils/consts";
-import {
-  CdpInfoFormatted,
-  CdpResponse,
-  IlksResponse,
-  TokenType,
-} from "@/utils/types";
+import { CdpInfoFormatted, CdpResponse, IlksResponse } from "@/utils/types";
+import { bytesToString } from "@defisaver/tokens/esm/utils";
 import React, { useEffect, useState } from "react";
 import Web3, { Contract } from "web3";
 
@@ -62,10 +60,7 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
         .call();
       const newDebt =
         (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
-      // Transforming bytes into ETH/WBTC/WSTETH string
-      const newIlk = window.web3.utils
-        .hexToAscii(cdpInfo.ilk) // "ETH-C\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
-        .split("-")[0]; // "ETH"
+      const newIlk = bytesToString(cdpInfo.ilk);
 
       const formattedCdpInfo: CdpInfoFormatted = {
         ...cdpInfo,
@@ -90,15 +85,23 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
     ).toFixed(DECIMAL_PLACES);
   }
 
-  function getPrice(token: TokenType) {
-    return token === "ETH" ? ethPrice : token === "WBTC" ? btcPrice : usdcPrice;
+  function getPrice(token: string) {
+    return token === "ETH-A"
+      ? ethPrice
+      : token === "WBTC-A"
+      ? btcPrice
+      : token === "WSTETH-A"
+      ? wstethPrice
+      : usdcPrice;
   }
 
-  function getLiquidationRatio(token: TokenType) {
-    return token === "ETH"
+  function getLiquidationRatio(token: string) {
+    return token === "ETH-A"
       ? ethLiquidationRatio
-      : token === "WBTC"
+      : token === "WBTC-A"
       ? btcLiquidationRatio
+      : token === "WSTETH-A"
+      ? wstethLiquidationRatio
       : usdcLiquidationRatio;
   }
 
@@ -129,7 +132,6 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
   async function signMessage() {
     try {
       const accounts = await window.web3.eth.requestAccounts();
-      console.log("window.web3.eth", window.web3.eth);
       const signature = await window.web3.eth.personal.sign(
         "Ovo je moj CDP",
         accounts[0],
