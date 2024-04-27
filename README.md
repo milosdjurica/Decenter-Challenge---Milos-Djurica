@@ -1,4 +1,8 @@
-### Installation and setup ->
+### Live demo
+
+https://decenter-challenge-web3-milos-djurica.vercel.app/
+
+### Installation and start project locally ->
 
 Clone repo
 
@@ -16,7 +20,6 @@ Start in development mode
 
 ```
 yarn dev
-
 ```
 
 ### Notes
