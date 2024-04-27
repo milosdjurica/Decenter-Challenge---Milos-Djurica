@@ -10,10 +10,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-center text-5xl font-semibold">
-        Decenter Challenge - Milos Djurica
-      </h1>
+    <div className="pt-10">
       <ChooseToken />
     </div>
   );
