@@ -21,7 +21,7 @@ import {
 import { Input } from "./ui/input";
 import { bytesToString } from "@defisaver/tokens/esm/utils";
 
-export default function ChooseToken() {
+export default function MainPage() {
   const [cdpInfoArray, setCdpInfoArray] = useState<CdpInfoFormatted[]>([]);
   const [token, setToken] = useState<TokenType>("ETH-A");
   const [cdpId, setCdpId] = useState(0);
