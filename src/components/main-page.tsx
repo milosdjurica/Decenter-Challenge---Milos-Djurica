@@ -1,15 +1,15 @@
 "use client";
 import { useEffect } from "react";
 import { Contract } from "web3";
-import { VAULT_ADDRESS } from "@/utils/consts";
-import { vaultContractAbi } from "@/utils/abi";
-import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
-import CdpInfoList from "./cdp-info-list";
 import { useRecoilState } from "recoil";
 import { cdpIdState, cdpInfoArrayState, tokenState } from "@/utils/atoms";
+import { MAX_CDP_ARRAY_LENGTH, VAULT_ADDRESS } from "@/utils/consts";
+import { VAULT_CONTRACT_ABI } from "@/utils/abi";
+import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
+import { formatCdpInfo } from "@/utils/helper-functions";
+import CdpInfoList from "./cdp-info-list";
 import ChooseToken from "./choose-token";
 import CdpIdInput from "./cdp-id-input";
-import { formatCdpInfo } from "@/utils/helper-functions";
 
 export default function MainPage() {
   const [cdpInfoArray, setCdpInfoArray] = useRecoilState(cdpInfoArrayState);
@@ -18,7 +18,10 @@ export default function MainPage() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (cdpInfoArray.length > 0 && cdpInfoArray.length < 20) {
+      if (
+        cdpInfoArray.length > 0 &&
+        cdpInfoArray.length < MAX_CDP_ARRAY_LENGTH
+      ) {
         alert("Already loading data! Try again when loading is finished!");
       } else if (cdpId > 0) {
         setCdpInfoArray([]);
@@ -36,10 +39,10 @@ export default function MainPage() {
     let counter = 1;
     const first = await fetchCDP(cdpId);
     if (first) arr.push(first);
-    while (arr.length < 20) {
+    while (arr.length < MAX_CDP_ARRAY_LENGTH) {
       const foundHigher = await fetchCDP(cdpId + counter);
       if (foundHigher) arr.push(foundHigher);
-      if (arr.length === 20) break;
+      if (arr.length === MAX_CDP_ARRAY_LENGTH) break;
 
       if (cdpId - counter > 0) {
         const foundLower = await fetchCDP(cdpId - counter);
@@ -51,8 +54,8 @@ export default function MainPage() {
 
   async function fetchCDP(id: number) {
     try {
-      const vaultContract: Contract<typeof vaultContractAbi> =
-        new window.web3.eth.Contract(vaultContractAbi, VAULT_ADDRESS);
+      const vaultContract: Contract<typeof VAULT_CONTRACT_ABI> =
+        new window.web3.eth.Contract(VAULT_CONTRACT_ABI, VAULT_ADDRESS);
       let newCdpInfo: CdpResponse = await vaultContract.methods
         .getCdpInfo(id)
         .call();

@@ -2,6 +2,10 @@ import { TokenType } from "./types";
 
 export const TOKENS: TokenType[] = ["ETH-A", "WBTC-A", "WSTETH-A"];
 export const DECIMAL_PLACES = 4;
+export const EIGHTEEN_DECIMALS = 1e18;
+export const TWENTY_SEVEN_DECIMALS = 1e27;
+export const ONE_HUNDRED = 100;
+export const MAX_CDP_ARRAY_LENGTH = 20;
 
 export const VAULT_ADDRESS = "0x68C61AF097b834c68eA6EA5e46aF6c04E8945B2d";
 export const RATE_CONTRACT_ADDRESS =

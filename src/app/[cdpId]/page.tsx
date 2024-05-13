@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Web3, { Contract } from "web3";
 import { Button } from "@/components/ui/button";
-import { vaultContractAbi } from "@/utils/abi/vault.abi";
+import { VAULT_CONTRACT_ABI } from "@/utils/abi/vault.abi";
 import { DECIMAL_PLACES, VAULT_ADDRESS } from "@/utils/consts";
 import {
   collateralizationRatio,
@@ -31,8 +31,8 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
 
   async function fetchCDP() {
     try {
-      const vaultContract: Contract<typeof vaultContractAbi> =
-        new window.web3.eth.Contract(vaultContractAbi, VAULT_ADDRESS);
+      const vaultContract: Contract<typeof VAULT_CONTRACT_ABI> =
+        new window.web3.eth.Contract(VAULT_CONTRACT_ABI, VAULT_ADDRESS);
       let newCdpInfo: CdpResponse = await vaultContract.methods
         .getCdpInfo(params.cdpId)
         .call();
@@ -99,7 +99,7 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
               {maxCollateralValueToExtractInUSD(cdpInfo).toFixed(
                 DECIMAL_PLACES
               )}{" "}
-              USD).
+              DAI).
             </span>
           </p>
           <p>

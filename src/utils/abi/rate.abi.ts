@@ -1,4 +1,4 @@
-export const rateContractAbi = [
+export const RATE_CONTRACT_ABI = [
   {
     inputs: [],
     payable: false,
