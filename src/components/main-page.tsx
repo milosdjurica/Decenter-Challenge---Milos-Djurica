@@ -1,30 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Contract } from "web3";
 
 import { rateContractAddress, vaultAddress } from "@/utils/consts";
 import { rateContractAbi, vaultContractAbi } from "@/utils/abi";
-import {
-  CdpInfoFormatted,
-  CdpResponse,
-  IlksResponse,
-  TokenType,
-} from "@/utils/types";
+import { CdpInfoFormatted, CdpResponse, IlksResponse } from "@/utils/types";
 import CdpInfoList from "./cdp-info-list";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Input } from "./ui/input";
 import { bytesToString } from "@defisaver/tokens/esm/utils";
+import { useRecoilState } from "recoil";
+import { cdpIdState, cdpInfoArrayState, tokenState } from "@/utils/atoms";
+import ChooseToken from "./choose-token";
+import CdpIdInput from "./cdp-id-input";
 
 export default function MainPage() {
-  const [cdpInfoArray, setCdpInfoArray] = useState<CdpInfoFormatted[]>([]);
-  const [token, setToken] = useState<TokenType>("ETH-A");
-  const [cdpId, setCdpId] = useState(0);
+  const [cdpInfoArray, setCdpInfoArray] = useRecoilState(cdpInfoArrayState);
+  const [token] = useRecoilState(tokenState);
+  const [cdpId] = useRecoilState(cdpIdState);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -112,36 +103,10 @@ export default function MainPage() {
   return (
     <div className="flex flex-col space-y-6 text-xl p-4">
       <div className="flex flex-col md:flex-row justify-evenly space-y-6 md:space-y-0">
-        <div className="flex items-center space-x-4">
-          <label htmlFor="tokenSelect" className="text-nowrap">
-            Select Token:
-          </label>
-          <Select onValueChange={(value) => setToken(value as TokenType)}>
-            <SelectTrigger className="w-[180px]" id="tokenSelect">
-              <SelectValue placeholder={token} />
-            </SelectTrigger>
-
-            <SelectContent defaultValue={token}>
-              <SelectItem value="ETH-A">ETH-A</SelectItem>
-              <SelectItem value="WBTC-A">WBTC-A</SelectItem>
-              <SelectItem value="WSTETH-A">WSTETH-A</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center space-x-4 ">
-          <label htmlFor="cdpId" className="text-nowrap">
-            Insert CDP ID:
-          </label>
-          <Input
-            id="cdpId"
-            // type="number"
-            value={cdpId}
-            onChange={(e) => setCdpId(Number(e.target.value))}
-            className="w-[180px]"
-          />
-        </div>
+        <ChooseToken />
+        <CdpIdInput />
       </div>
-      <CdpInfoList cdpInfoArray={cdpInfoArray} token={token} />
+      <CdpInfoList />
     </div>
   );
 }

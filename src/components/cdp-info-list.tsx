@@ -10,14 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DECIMAL_PLACES } from "@/utils/consts";
+import { useRecoilState } from "recoil";
+import { cdpInfoArrayState, tokenState } from "@/utils/atoms";
 
-export default function CdpInfoList({
-  cdpInfoArray,
-  token,
-}: {
-  cdpInfoArray: CdpInfoFormatted[];
-  token: TokenType;
-}) {
+export default function CdpInfoList({}) {
+  const [cdpInfoArray] = useRecoilState(cdpInfoArrayState);
+  const [token] = useRecoilState(tokenState);
+
   return (
     <div className="flex flex-col">
       <Table className="md:w-[90%] m-auto border-2 md:text-lg border-primary">
