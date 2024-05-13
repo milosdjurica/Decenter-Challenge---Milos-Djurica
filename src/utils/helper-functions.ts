@@ -87,7 +87,7 @@ export function maxCollateralValueToExtract(cdpInfo: CdpInfoFormatted) {
   return totalValue - minimumValue;
 }
 
-export function maxDebtPossibleWIthoutLiquidation(cdpInfo: CdpInfoFormatted) {
+export function maxDebtPossibleWithoutLiquidation(cdpInfo: CdpInfoFormatted) {
   return (
     ((cdpInfo.collateral * getPrice(cdpInfo.ilk)) /
       getLiquidationRatio(cdpInfo.ilk)) *

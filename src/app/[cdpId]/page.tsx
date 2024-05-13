@@ -11,7 +11,7 @@ import {
   getLiquidationRatio,
   maxCollateralValueToExtract,
   maxCollateralValueToExtractInUSD,
-  maxDebtPossibleWIthoutLiquidation,
+  maxDebtPossibleWithoutLiquidation,
 } from "@/utils/helper-functions";
 import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
 
@@ -66,34 +66,34 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
         <div className="space-y-4">
           <p>
             COLLATERAL:{" "}
-            <span className="underline font-semibold">
-              {Number(cdpInfo?.collateral).toFixed(DECIMAL_PLACES)}{" "}
+            <span className="font-bold">
+              {Number(cdpInfo.collateral).toFixed(DECIMAL_PLACES)}{" "}
               {cdpInfo?.ilk}
             </span>
           </p>
 
           <p>
             DEBT:{" "}
-            <span className="underline font-semibold">
-              {Number(cdpInfo?.debt).toFixed(DECIMAL_PLACES)} DAI
+            <span className="font-bold">
+              {Number(cdpInfo.debt).toFixed(DECIMAL_PLACES)} DAI
             </span>
           </p>
           <p>
             Collateralization ratio:{" "}
-            <span className="underline font-semibold">
+            <span className="font-bold">
               {collateralizationRatio(cdpInfo)}%
             </span>
             .
           </p>
           <p>
             Minimum ratio is:{" "}
-            <span className="underline font-semibold">
+            <span className="font-bold">
               {getLiquidationRatio(cdpInfo.ilk)}%.
             </span>{" "}
           </p>
           <p>
             Max collateral value to extract without getting liquidated:{" "}
-            <span className="underline font-semibold">
+            <span className="font-bold">
               {maxCollateralValueToExtract(cdpInfo).toFixed(DECIMAL_PLACES)}{" "}
               {cdpInfo.ilk} ($
               {maxCollateralValueToExtractInUSD(cdpInfo).toFixed(
@@ -104,8 +104,8 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
           </p>
           <p>
             Max debt possible:{" "}
-            <span className="underline font-semibold">
-              {maxDebtPossibleWIthoutLiquidation(cdpInfo).toFixed(
+            <span className="font-bold">
+              {maxDebtPossibleWithoutLiquidation(cdpInfo).toFixed(
                 DECIMAL_PLACES
               )}{" "}
               DAI.
@@ -113,9 +113,9 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
           </p>
           <p>
             How much more can you take:{" "}
-            <span className="underline font-semibold">
+            <span className="font-bold">
               {(
-                maxDebtPossibleWIthoutLiquidation(cdpInfo) - cdpInfo.debt
+                maxDebtPossibleWithoutLiquidation(cdpInfo) - cdpInfo.debt
               ).toFixed(DECIMAL_PLACES)}{" "}
               DAI.
             </span>
