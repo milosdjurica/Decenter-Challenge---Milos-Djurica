@@ -1,23 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { rateContractAbi } from "@/utils/abi/rate.abi";
 import { vaultContractAbi } from "@/utils/abi/vault.abi";
+import { DECIMAL_PLACES, vaultAddress } from "@/utils/consts";
 import {
-  DECIMAL_PLACES,
-  btcLiquidationRatio,
-  btcPrice,
-  ethLiquidationRatio,
-  ethPrice,
-  rateContractAddress,
-  usdcLiquidationRatio,
-  usdcPrice,
-  vaultAddress,
-  wstethLiquidationRatio,
-  wstethPrice,
-} from "@/utils/consts";
-import { CdpInfoFormatted, CdpResponse, IlksResponse } from "@/utils/types";
-import { bytesToString } from "@defisaver/tokens/esm/utils";
+  collateralizationRatio,
+  formatCdpInfo,
+  getLiquidationRatio,
+  maxCollateralValueToExtract,
+  maxCollateralValueToExtractInUSD,
+  maxDebtPossibleWIthoutLiquidation,
+} from "@/utils/helper-functions";
+import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
 import React, { useEffect, useState } from "react";
 import Web3, { Contract } from "web3";
 
@@ -42,91 +36,12 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
       let newCdpInfo: CdpResponse = await vaultContract.methods
         .getCdpInfo(params.cdpId)
         .call();
-      const formattedCdpInfo = await formatCdpInfo(newCdpInfo);
+      const formattedCdpInfo = await formatCdpInfo(params.cdpId, newCdpInfo);
       setCdpInfo(formattedCdpInfo);
     } catch (error) {
       console.log("error", error);
       throw error;
     }
-  }
-
-  async function formatCdpInfo(cdpInfo: CdpResponse) {
-    try {
-      const rateContract: Contract<typeof rateContractAbi> =
-        new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
-      const newCollateral = Number(cdpInfo.collateral) / 1e18;
-      const debtRate: IlksResponse = await rateContract.methods
-        .ilks(cdpInfo.ilk)
-        .call();
-      const newDebt =
-        (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
-      const newIlk = bytesToString(cdpInfo.ilk);
-
-      const formattedCdpInfo: CdpInfoFormatted = {
-        ...cdpInfo,
-        id: params.cdpId,
-        debt: newDebt,
-        ilk: newIlk,
-        collateral: newCollateral,
-      };
-
-      return formattedCdpInfo;
-    } catch (error) {
-      console.log("error", error);
-      throw error;
-    }
-  }
-
-  function collateralizationRatio(cdpInfo: CdpInfoFormatted) {
-    if (cdpInfo.debt <= 0) return 0;
-    return (
-      (cdpInfo.collateral * getPrice(cdpInfo.ilk) * 100) /
-      cdpInfo.debt
-    ).toFixed(DECIMAL_PLACES);
-  }
-
-  function getPrice(token: string) {
-    return token === "ETH-A"
-      ? ethPrice
-      : token === "WBTC-A"
-      ? btcPrice
-      : token === "WSTETH-A"
-      ? wstethPrice
-      : usdcPrice;
-  }
-
-  function getLiquidationRatio(token: string) {
-    return token === "ETH-A"
-      ? ethLiquidationRatio
-      : token === "WBTC-A"
-      ? btcLiquidationRatio
-      : token === "WSTETH-A"
-      ? wstethLiquidationRatio
-      : usdcLiquidationRatio;
-  }
-
-  function maxCollateralValueToExtractInUSD(cdpInfo: CdpInfoFormatted) {
-    const totalValue = cdpInfo.collateral * getPrice(cdpInfo.ilk);
-    const minimumValue =
-      (cdpInfo.debt * getLiquidationRatio(cdpInfo.ilk)) / 100;
-    return totalValue - minimumValue;
-  }
-
-  function maxCollateralValueToExtract(cdpInfo: CdpInfoFormatted) {
-    const totalValue = cdpInfo.collateral;
-    const minimumValue =
-      (cdpInfo.debt * getLiquidationRatio(cdpInfo.ilk)) /
-      100 /
-      getPrice(cdpInfo.ilk);
-    return totalValue - minimumValue;
-  }
-
-  function maxDebtPossibleWIthoutLiquidation(cdpInfo: CdpInfoFormatted) {
-    return (
-      ((cdpInfo.collateral * getPrice(cdpInfo.ilk)) /
-        getLiquidationRatio(cdpInfo.ilk)) *
-      100
-    );
   }
 
   async function signMessage() {

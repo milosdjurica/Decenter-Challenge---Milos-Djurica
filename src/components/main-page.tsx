@@ -2,15 +2,15 @@
 import { useEffect } from "react";
 import { Contract } from "web3";
 
-import { rateContractAddress, vaultAddress } from "@/utils/consts";
-import { rateContractAbi, vaultContractAbi } from "@/utils/abi";
-import { CdpInfoFormatted, CdpResponse, IlksResponse } from "@/utils/types";
+import { vaultAddress } from "@/utils/consts";
+import { vaultContractAbi } from "@/utils/abi";
+import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
 import CdpInfoList from "./cdp-info-list";
-import { bytesToString } from "@defisaver/tokens/esm/utils";
 import { useRecoilState } from "recoil";
 import { cdpIdState, cdpInfoArrayState, tokenState } from "@/utils/atoms";
 import ChooseToken from "./choose-token";
 import CdpIdInput from "./cdp-id-input";
+import { formatCdpInfo } from "@/utils/helper-functions";
 
 export default function MainPage() {
   const [cdpInfoArray, setCdpInfoArray] = useRecoilState(cdpInfoArrayState);
@@ -65,35 +65,6 @@ export default function MainPage() {
         ]);
         return formattedCdpInfo;
       }
-    } catch (error) {
-      console.log("error", error);
-      throw error;
-    }
-  }
-
-  async function formatCdpInfo(id: number, cdpInfo: CdpResponse) {
-    try {
-      const rateContract: Contract<typeof rateContractAbi> =
-        new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
-      const newCollateral = Number(cdpInfo.collateral) / 1e18;
-      const debtRate: IlksResponse = await rateContract.methods
-        .ilks(cdpInfo.ilk)
-        .call();
-      // 1e18 -> 18 decimals for debt, 1e27 -> 27 decimals for debt rate
-      const newDebt =
-        (Number(cdpInfo.debt) * Number(debtRate.rate)) / 1e18 / 1e27;
-      // Transforming bytes into ETH/WBTC/WSTETH string
-      const newIlk = bytesToString(cdpInfo.ilk);
-
-      const formattedCdpInfo: CdpInfoFormatted = {
-        ...cdpInfo,
-        id,
-        debt: newDebt,
-        ilk: newIlk,
-        collateral: newCollateral,
-      };
-
-      return formattedCdpInfo;
     } catch (error) {
       console.log("error", error);
       throw error;
