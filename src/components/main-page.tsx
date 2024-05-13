@@ -1,8 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { Contract } from "web3";
-
-import { vaultAddress } from "@/utils/consts";
+import { VAULT_ADDRESS } from "@/utils/consts";
 import { vaultContractAbi } from "@/utils/abi";
 import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
 import CdpInfoList from "./cdp-info-list";
@@ -53,7 +52,7 @@ export default function MainPage() {
   async function fetchCDP(id: number) {
     try {
       const vaultContract: Contract<typeof vaultContractAbi> =
-        new window.web3.eth.Contract(vaultContractAbi, vaultAddress);
+        new window.web3.eth.Contract(vaultContractAbi, VAULT_ADDRESS);
       let newCdpInfo: CdpResponse = await vaultContract.methods
         .getCdpInfo(id)
         .call();

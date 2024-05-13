@@ -1,24 +1,24 @@
+import { Contract } from "web3";
 import { bytesToString } from "@defisaver/tokens/esm/utils";
 import { CdpInfoFormatted, CdpResponse, IlksResponse } from "./types";
-import { Contract } from "web3";
 import { rateContractAbi } from "./abi";
 import {
   DECIMAL_PLACES,
-  btcLiquidationRatio,
-  btcPrice,
-  ethLiquidationRatio,
-  ethPrice,
-  rateContractAddress,
-  usdcLiquidationRatio,
-  usdcPrice,
-  wstethLiquidationRatio,
-  wstethPrice,
+  BTC_LIQUIDATION_RATIO,
+  BTC_PRICE,
+  ETH_LIQUIDATION_RATIO,
+  ETH_PRICE,
+  WSTETH_LIQUIDATION_RATIO,
+  WSTETH_PRICE,
+  USDC_LIQUIDATION_RATIO,
+  USDC_PRICE,
+  RATE_CONTRACT_ADDRESS,
 } from "./consts";
 
 export async function formatCdpInfo(id: number, cdpInfo: CdpResponse) {
   try {
     const rateContract: Contract<typeof rateContractAbi> =
-      new window.web3.eth.Contract(rateContractAbi, rateContractAddress);
+      new window.web3.eth.Contract(rateContractAbi, RATE_CONTRACT_ADDRESS);
     const newCollateral = Number(cdpInfo.collateral) / 1e18;
     const debtRate: IlksResponse = await rateContract.methods
       .ilks(cdpInfo.ilk)
@@ -54,22 +54,22 @@ export function collateralizationRatio(cdpInfo: CdpInfoFormatted) {
 
 export function getPrice(token: string) {
   return token === "ETH-A"
-    ? ethPrice
+    ? ETH_PRICE
     : token === "WBTC-A"
-    ? btcPrice
+    ? BTC_PRICE
     : token === "WSTETH-A"
-    ? wstethPrice
-    : usdcPrice;
+    ? WSTETH_PRICE
+    : USDC_PRICE;
 }
 
 export function getLiquidationRatio(token: string) {
   return token === "ETH-A"
-    ? ethLiquidationRatio
+    ? ETH_LIQUIDATION_RATIO
     : token === "WBTC-A"
-    ? btcLiquidationRatio
+    ? BTC_LIQUIDATION_RATIO
     : token === "WSTETH-A"
-    ? wstethLiquidationRatio
-    : usdcLiquidationRatio;
+    ? WSTETH_LIQUIDATION_RATIO
+    : USDC_LIQUIDATION_RATIO;
 }
 
 export function maxCollateralValueToExtractInUSD(cdpInfo: CdpInfoFormatted) {

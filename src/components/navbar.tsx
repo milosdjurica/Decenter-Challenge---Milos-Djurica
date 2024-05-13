@@ -1,6 +1,6 @@
 import React from "react";
-import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Navbar() {
   return (

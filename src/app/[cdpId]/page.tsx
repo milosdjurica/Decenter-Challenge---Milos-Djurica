@@ -1,8 +1,10 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import Web3, { Contract } from "web3";
 import { Button } from "@/components/ui/button";
 import { vaultContractAbi } from "@/utils/abi/vault.abi";
-import { DECIMAL_PLACES, vaultAddress } from "@/utils/consts";
+import { DECIMAL_PLACES, VAULT_ADDRESS } from "@/utils/consts";
 import {
   collateralizationRatio,
   formatCdpInfo,
@@ -12,8 +14,6 @@ import {
   maxDebtPossibleWIthoutLiquidation,
 } from "@/utils/helper-functions";
 import { CdpInfoFormatted, CdpResponse } from "@/utils/types";
-import React, { useEffect, useState } from "react";
-import Web3, { Contract } from "web3";
 
 export default function CdpPage({ params }: { params: { cdpId: number } }) {
   const [cdpInfo, setCdpInfo] = useState<CdpInfoFormatted>();
@@ -32,7 +32,7 @@ export default function CdpPage({ params }: { params: { cdpId: number } }) {
   async function fetchCDP() {
     try {
       const vaultContract: Contract<typeof vaultContractAbi> =
-        new window.web3.eth.Contract(vaultContractAbi, vaultAddress);
+        new window.web3.eth.Contract(vaultContractAbi, VAULT_ADDRESS);
       let newCdpInfo: CdpResponse = await vaultContract.methods
         .getCdpInfo(params.cdpId)
         .call();

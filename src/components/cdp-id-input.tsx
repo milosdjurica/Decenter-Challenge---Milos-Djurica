@@ -1,7 +1,7 @@
 import React from "react";
-import { Input } from "./ui/input";
 import { useRecoilState } from "recoil";
 import { cdpIdState } from "@/utils/atoms";
+import { Input } from "./ui/input";
 
 export default function CdpIdInput() {
   const [cdpId, setCdpId] = useRecoilState(cdpIdState);

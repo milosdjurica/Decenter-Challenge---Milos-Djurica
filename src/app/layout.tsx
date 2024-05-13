@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import RecoilRootComponent from "@/components/recoil-root";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
-import RecoilRootComponent from "@/components/recoil-root";
 
-const inter = Inter({ subsets: ["latin"] });
 const space = Space_Grotesk({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

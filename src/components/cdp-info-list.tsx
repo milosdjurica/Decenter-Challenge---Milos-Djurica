@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CdpInfoFormatted, TokenType } from "@/utils/types";
+import { useRecoilState } from "recoil";
+import { cdpInfoArrayState, tokenState } from "@/utils/atoms";
 import {
   Table,
   TableBody,
@@ -10,10 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DECIMAL_PLACES } from "@/utils/consts";
-import { useRecoilState } from "recoil";
-import { cdpInfoArrayState, tokenState } from "@/utils/atoms";
 
-export default function CdpInfoList({}) {
+export default function CdpInfoList() {
   const [cdpInfoArray] = useRecoilState(cdpInfoArrayState);
   const [token] = useRecoilState(tokenState);
 

@@ -1,4 +1,6 @@
 import React from "react";
+import { useRecoilState } from "recoil";
+import { tokenState } from "@/utils/atoms";
 import {
   Select,
   SelectContent,
@@ -6,10 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useRecoilState } from "recoil";
-import { tokenState } from "@/utils/atoms";
 import { TokenType } from "@/utils/types";
-import { tokens } from "@/utils/consts";
+import { TOKENS } from "@/utils/consts";
 
 export default function ChooseToken() {
   const [token, setToken] = useRecoilState(tokenState);
@@ -25,7 +25,7 @@ export default function ChooseToken() {
         </SelectTrigger>
 
         <SelectContent defaultValue={token}>
-          {tokens.map((tokenElement) => (
+          {TOKENS.map((tokenElement) => (
             <SelectItem key={tokenElement} value={tokenElement}>
               {tokenElement}
             </SelectItem>
